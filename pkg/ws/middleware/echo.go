@@ -4,8 +4,8 @@ import (
 	"context"
 	"errors"
 
-	"github.com/viktordanov/itemIndexrWSSync/pkg/ws/io"
-	"github.com/viktordanov/itemIndexrWSSync/pkg/ws/middleware/priority"
+	"github.com/viktordanov/go-youtube-sync/pkg/ws/io"
+	"github.com/viktordanov/go-youtube-sync/pkg/ws/middleware/priority"
 	"nhooyr.io/websocket"
 )
 

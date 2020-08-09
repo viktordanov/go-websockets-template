@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log"
 
-	"github.com/viktordanov/itemIndexrWSSync/pkg/ws/middleware/priority"
+	"github.com/viktordanov/go-youtube-sync/pkg/ws/middleware/priority"
 )
 
 // type Middleware interface {

@@ -1,13 +1,13 @@
 package main
 
 import (
+	"github.com/viktordanov/go-youtube-sync/cmd/cli/middleware"
 	"log"
 	"math/rand"
 	"time"
 
-	"github.com/viktordanov/itemIndexrWSSync/pkg/ws"
-	m "github.com/viktordanov/itemIndexrWSSync/pkg/ws/middleware"
-	p "github.com/viktordanov/itemIndexrWSSync/pkg/ws/middleware/priority"
+	"github.com/viktordanov/go-youtube-sync/pkg/ws"
+	p "github.com/viktordanov/go-youtube-sync/pkg/ws/middleware/priority"
 )
 
 func init() {
@@ -17,6 +17,9 @@ func init() {
 
 func main() {
 	wss := ws.NewWSServer()
-	wss.AddMiddleware(m.NewEcho(p.HIGH, "Echo middleware"))
+	wss.AddMiddleware(middleware.NewListUsers(p.NORMAL, "List users middleware"))
+	wss.AddMiddleware(middleware.NewListRooms(p.NORMAL, "List rooms middleware"))
+	wss.AddMiddleware(middleware.NewRoom(p.NORMAL, "Room command middleware"))
+	wss.AddMiddleware(middleware.NewChat(p.NORMAL, "Chat middleware"))
 	wss.Serve()
 }

@@ -15,3 +15,6 @@
 # vendor/
 .vscode/settings.json
 go.sum
+.idea/
+go-youtube-sync
+main

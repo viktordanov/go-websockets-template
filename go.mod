@@ -1,4 +1,4 @@
-module github.com/viktordanov/itemIndexrWSSync
+module github.com/viktordanov/go-youtube-sync
 
 go 1.14
 

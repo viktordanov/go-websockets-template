@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/viktordanov/itemIndexrWSSync/pkg/ws/internal/bpool"
-	"github.com/viktordanov/itemIndexrWSSync/pkg/ws/internal/errd"
+	"github.com/viktordanov/go-youtube-sync/pkg/ws/internal/bpool"
+	"github.com/viktordanov/go-youtube-sync/pkg/ws/internal/errd"
 	"nhooyr.io/websocket"
 )
 
