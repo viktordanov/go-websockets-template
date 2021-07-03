@@ -72,6 +72,10 @@ func (m *Room) Process(ctx context.Context, msg mdw.Message) (context.Context, m
 		return m.HandleGetURL(ctx, msg, c, users, rooms)
 	case "get-playlist":
 		return m.HandleGetPlaylist(ctx, msg, c, users, rooms)
+	case "get-current-with-time":
+		fallthrough
+	case "get-current-with-time-reply":
+		return m.HandleCurrentWithTime(ctx, msg, c, users, rooms)
 	}
 
 	return ctx, msg, nil
@@ -86,7 +90,7 @@ func (m *Room) GetName() string {
 }
 
 func (m *Room) HandledChannels() []string {
-	return []string{"add-room", "remove-room", "join-room", "leave-room", "command", "get-url", "get-playlist"}
+	return []string{"add-room", "remove-room", "join-room", "leave-room", "command", "get-url", "get-playlist", "get-current-with-time", "get-current-with-time-reply"}
 }
 
 func (m *Room) HandleAddRoom(ctx context.Context, msg mdw.Message, c *websocket.Conn, users map[string]*model.User, rooms map[string]*model.Room) (context.Context, mdw.Message, error) {
@@ -294,7 +298,7 @@ func (m *Room) HandleCommand(ctx context.Context, msg mdw.Message, c *websocket.
 
 	if command == "next" {
 		content = room.NextUrl()
-		BroadcastPlaylist(ctx, room)
+		//BroadcastPlaylist(ctx, room)
 	}
 	if command == "auto-next" {
 		if user.Name != room.Owner {
@@ -309,7 +313,7 @@ func (m *Room) HandleCommand(ctx context.Context, msg mdw.Message, c *websocket.
 
 	if command == "prev" {
 		content = room.PrevUrl()
-		BroadcastPlaylist(ctx, room)
+		//BroadcastPlaylist(ctx, room)
 	}
 
 	if command == "set-index" {
@@ -319,7 +323,7 @@ func (m *Room) HandleCommand(ctx context.Context, msg mdw.Message, c *websocket.
 		}
 		room.SetCurrentIndex(index)
 		content = room.CurrentUrl()
-		BroadcastPlaylist(ctx, room)
+		//BroadcastPlaylist(ctx, room)
 	}
 
 	for _, user := range room.Users {
@@ -403,6 +407,47 @@ func (m *Room) HandleGetPlaylist(ctx context.Context, msg mdw.Message, c *websoc
 	replyStr := string(replyJson)
 
 	io.WriterJSON(ctx, user.Connection, msg.Channel, replyStr)
+
+	return ctx, msg, nil
+
+}
+
+func (m *Room) HandleCurrentWithTime(ctx context.Context, msg mdw.Message, c *websocket.Conn, users map[string]*model.User, rooms map[string]*model.Room) (context.Context, mdw.Message, error) {
+	var user *model.User
+	var room *model.Room
+	for _, u := range users {
+		if u.Connection == c {
+			user = u
+		}
+	}
+	if user == nil {
+		chat.SendChatMessage(ctx, c, "error", "User not found!")
+		return ctx, msg, nil
+	}
+	for _, r := range rooms {
+		found := false
+		for _, u := range r.Users {
+			if u.Name == user.Name {
+				found = true
+				room = r
+				break
+			}
+		}
+		if found {
+			break
+		}
+	}
+	if room == nil {
+		chat.SendChatMessage(ctx, c, "error", "User room not found!")
+		return ctx, msg, nil
+	}
+
+	for _, user := range room.Users {
+		if user.Connection == c {
+			continue
+		}
+		io.WriterFull(ctx, user.Connection, msg.Channel, msg.Message, msg.Metadata, msg.Metadata2)
+	}
 
 	return ctx, msg, nil
 }
